@@ -303,11 +303,54 @@ func main() {
 
 	// lastly using built in function 'make' to declare slice
 	fmt.Println("\nusing make fuction")
-	slice8 := make([]int, 3)
+	slice8 := make([]int, 3, 100) // ([]type,length,capacity)
 	fmt.Println(slice8)
 	fmt.Printf("Length: %v\n", len(slice8))
 	fmt.Printf("Capacity: %v\n", cap(slice8))
 
+	// append function
+	slice9 := []int{}
+	fmt.Println(slice9)
+	fmt.Printf("Length: %v\n", len(slice9))
+	fmt.Printf("Capacity: %v\n", cap(slice9))
+	slice9 = append(slice9, 1)
+	fmt.Println(slice9)
+	fmt.Printf("Length: %v\n", len(slice9))
+	fmt.Printf("Capacity: %v\n", cap(slice9))
+	// concat
+	// slice9 = append(slice9, 2, 3, 4, 5)
+	slice9 = append(slice9, []int{2, 3, 4, 5}...) // can also do this to concat two slices
+	fmt.Println(slice9)
+	fmt.Printf("Length: %v\n", len(slice9))
+	fmt.Printf("Capacity: %v\n", cap(slice9))
+
+	// stack operation
+	slice10 := []int{1, 2, 3, 4, 5}
+	fmt.Println(slice10)
+	slice11 := slice10[:len(slice10)-1] // [1 2 3 4]
+	fmt.Println(slice11)
+	slice12 := append(slice10[:2], slice10[3:]...) // [1 2 4 5]
+	fmt.Println(slice12)
+	fmt.Println(slice10)
+
+	// summary of array and slices
+	// - array: - collections of item with the sme type
+	// 		 - fixed size
+	// 		 - a := [3]int{1,2,3}
+	// 		 - a := [_]int{1,2,3}
+	// 		 - var a = []int
+	// 		 - len() func returns size of array
+	// 		 - copies refer to different underlying data
+	// - slices: - backed by array
+	// 		  - creation styles: - slice existing array or slice
+	// 							 - literal styles
+	// 							 - via make fuction
+	// 		  - len() returns length of slice
+	// 		  - cap() returns length of underlying array
+	// 		  - append() add elements to slice: may cause expensive copy operation if underlyingarray is to small
+	// 		  - copies refer to same underlying array :- affected other slices
+
+	
 	// for loop type 1
 	var k int
 	fmt.Println("\nFor loop type 1")
