@@ -253,6 +253,60 @@ func main() {
 	// - iota starts at 0 each const block and increments by one
 
 	// 4th chapter : Array and Slices
+	// grades := [3]int{4, 13, 666}
+	grades := [...]int{4, 13, 666} // [...] tells that we want to intialize array just large enoght to hold the value, no need to specify the size
+	fmt.Printf("\nGrades: %v\n", grades)
+
+	var students [3]string
+	fmt.Printf("Students: %v\n", students)
+	students[0] = "Lisa"
+	students[1] = "Ahmed"
+	students[2] = "Arnold"
+	fmt.Printf("Students: %v\n", students)
+	fmt.Printf("Number of Students: %v\n", len(students))
+
+	// var identityMatrix [3][3]int = [3][3]int{ [3]int{1,0,0},[3]int{0,1,0},[3]int{0,0,1}}
+	var identityMatrix [3][3]int
+	identityMatrix[0] = [3]int{1, 0, 0}
+	identityMatrix[1] = [3]int{0, 1, 0}
+	identityMatrix[2] = [3]int{0, 0, 1}
+	fmt.Printf("%v\n", identityMatrix)
+
+	arr1 := [...]int{1, 2, 3}
+	// arr2 := arr1
+	arr2 := &arr1 //arr1 also change with arr2
+	arr2[1] = 5
+	fmt.Println(arr1)
+	fmt.Println(arr2)
+
+	// Slice
+	slice1 := []int{1, 2, 3} // intialization
+	// slice2 := &slice1 // different from array, slice is a reference type
+	slice2 := slice1
+	slice2[1] = 5
+	fmt.Println(slice1)
+	fmt.Println(slice2)
+	fmt.Printf("Length: %v\n", len(slice1))
+	fmt.Printf("Capacity: %v\n", cap(slice1)) // capacity in the array
+
+	// various way to initialize slice
+	slice3 := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+	slice4 := slice3[:]   // slice of all element
+	slice5 := slice3[3:]  // slice from 4th element to end
+	slice6 := slice3[:6]  // slice of first 6 elements
+	slice7 := slice3[3:6] // slice the 4th,5th and 6th elements
+	fmt.Println(slice3)
+	fmt.Println(slice4)
+	fmt.Println(slice5)
+	fmt.Println(slice6)
+	fmt.Println(slice7)
+
+	// lastly using built in function 'make' to declare slice
+	fmt.Println("\nusing make fuction")
+	slice8 := make([]int, 3)
+	fmt.Println(slice8)
+	fmt.Printf("Length: %v\n", len(slice8))
+	fmt.Printf("Capacity: %v\n", cap(slice8))
 
 	// for loop type 1
 	var k int
