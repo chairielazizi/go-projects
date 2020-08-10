@@ -21,6 +21,43 @@ var (
 // uppercase naming :	var I int	--> exported from the package and globally visible
 // block scope		:	--> not visible to the outside block itself
 
+// Constants
+const (
+	myConst1 = iota
+	myConst2 = iota
+	myConst3 = iota
+)
+const (
+	// errorSpecialList = iota
+	// _ = iota + 5
+	_ = iota // dont care what it is
+	catSpecialList
+	dogSpecialList
+	snakeSpecialList
+)
+const (
+	_  = iota             // ignore first value by assigning to blank identifier
+	KB = 1 << (10 * iota) // intialize
+	MB
+	GB
+	TB
+	PB
+	EB
+	ZB
+	YB
+)
+const (
+	isAdmin = 1 << iota
+	isHeadquarters
+	canSeeFinancials
+
+	canSeeAfrica
+	canSeeAsia
+	canSeeEurope
+	canSeeNorthAmerica
+	canSeeSouthAmerica
+)
+
 func main() {
 	fmt.Println("First programe in GoLang")
 
@@ -179,9 +216,43 @@ func main() {
 	// 				 - strings.Reader.#ReadRune
 
 	// 3rd chapter: Constants
+	// naming convention
+	const myConst int = 42
+	fmt.Printf("%v, %T\n", myConst, myConst)
+	var nonConst int16 = 27
+	fmt.Printf("%v, %T\n", int16(myConst)+nonConst, int16(myConst)+nonConst)
 	//for declaring constant
-	const ba = 99
-	fmt.Println("\n", ba)
+	const bA = 99
+	fmt.Println("\n", bA)
+
+	// iota is a counter that we can use when we create a numerator constant
+	fmt.Printf("%v, %T\n", myConst1, myConst1)
+	fmt.Printf("%v, %T\n", myConst2, myConst2)
+	fmt.Printf("%v, %T\n", myConst3, myConst3)
+
+	var specialListType int = dogSpecialList
+	fmt.Printf("%v\n", specialListType == dogSpecialList)
+
+	fileSize := 4000000000.
+	fmt.Printf("%.2fGB\n", fileSize/GB)
+
+	var roles byte = isAdmin | canSeeFinancials | canSeeEurope
+	fmt.Printf("%b\n", roles)
+	fmt.Printf("Is admin? %v\n", isAdmin&roles == isAdmin)
+	fmt.Printf("Is hq? %v\n", isHeadquarters&roles == isHeadquarters)
+
+	// summry of Constant
+	// - immutable, but can be shadowed
+	// - replaced by the compiler at compile time
+	// - value must be calculate at compile time
+	// - PascalCase for experted Constants
+	// - camelCase for internal Constants
+	// - typed constants work like immutable var :- only same type
+	// - untyped constand work like literal :- work with similar type
+	// - enumerated const
+	// - iota starts at 0 each const block and increments by one
+
+	// 4th chapter : Array and Slices
 
 	// for loop type 1
 	var k int
