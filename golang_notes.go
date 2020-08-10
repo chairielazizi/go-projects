@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"reflect"
 	"strconv" // to cast number to string
 )
 
@@ -333,6 +334,17 @@ func main() {
 	fmt.Println(slice12)
 	fmt.Println(slice10)
 
+	//array in goland
+	var array1 [5]string
+	array1[0] = "My"
+	array1[1] = "name"
+	array1[2] = "is"
+	array1[3] = "Chairiel"
+	array1[4] = "Azizi"
+	for k := 0; k < len(array1); k++ {
+		fmt.Printf(array1[k] + " ")
+	}
+
 	// summary of array and slices
 	// - array: - collections of item with the sme type
 	// 		 - fixed size
@@ -350,7 +362,126 @@ func main() {
 	// 		  - append() add elements to slice: may cause expensive copy operation if underlyingarray is to small
 	// 		  - copies refer to same underlying array :- affected other slices
 
-	
+	// 5th chapter : Map and Structs
+
+	// Map
+	fmt.Println()
+	statePopulations := map[string]int{
+		"California":   39250017,
+		"Texas":        27862596,
+		"Florida":      20612439,
+		"New York":     19745289,
+		"Pennyslvania": 12802503,
+		"Illinois":     12801539,
+		"Ohio":         11614373,
+	}
+	fmt.Println(statePopulations)
+	// map1 := map[[]int]string{}
+	// error because slice cannot be a key of map
+	map1 := map[[3]int]string{} // but array can
+	fmt.Println(statePopulations, map1)
+	fmt.Println(statePopulations["Ohio"])
+
+	// add data to map
+	statePopulations["Georgia"] = 10310371
+	fmt.Println(statePopulations)
+
+	//delete data in map
+	delete(statePopulations, "Georgia")
+	fmt.Println(statePopulations) // no error, instead return zero
+
+	// ways to check data in map
+	pop, ok := statePopulations["Oho"]
+	// comma ok to check it
+	fmt.Println(pop, ok)
+
+	//length of map
+	fmt.Println(len(statePopulations))
+
+	// map also affected like array and slices
+	sp := statePopulations
+	// delete(sp, "Ohio")
+	fmt.Println(sp)
+	fmt.Println(statePopulations)
+
+	// map using make function
+	statePopulations1 := make(map[string]int)
+	// statePopulations1 := make(map[string]int, 10)
+	fmt.Println(statePopulations1)
+
+	// Structs
+	// structs is independent data type unlike array,slices and map
+	type Doctor struct {
+		number     int
+		doctorName string
+		companions []string
+	}
+	doctor1 := Doctor{
+		number:     3,
+		doctorName: "Rahman Jailani",
+		companions: []string{
+			"Peta Jensen",
+			"Osman Kencan",
+		},
+	}
+	fmt.Println(doctor1)
+
+	// anonymous struct
+	doctor2 := struct{ name string }{name: "John Labu"}
+	fmt.Println(doctor2)
+	doctor3 := doctor2
+	doctor3.name = "Alharbib Anyong"
+	fmt.Println(doctor2)
+	fmt.Println(doctor3)
+	doctor4 := &doctor2
+	fmt.Println(doctor4)
+
+	// GoLang has no inheritance
+	// but it has the same components like it which called as compositions
+	// through embedding
+	type Animal struct {
+		name   string
+		origin string
+	}
+	type Bird struct {
+		Animal // this is the composition by embedding the Animal struct into Bird struct
+		speed  float32
+		canFly bool
+	}
+
+	bird1 := Bird{}
+	bird1.name = "Emu"
+	bird1.origin = "Australia"
+	bird1.speed = 48
+	bird1.canFly = false
+	fmt.Println(bird1)
+
+	type Birdie struct {
+		// Animal: Animal{name: "Hornbill",origin:"Borneo"},
+		// speed  float32,
+		// canFly bool,
+	}
+	//for validation framework
+	type AnimalValidation struct {
+		name   string `required max:"100"`
+		origin string
+	}
+	t := reflect.TypeOf(Animal{})
+	field, _ := t.FieldByName("name")
+	fmt.Println(field.Tag)
+
+	// summary of Structs and Map
+	// - Map: - collections of valuea that are accessed by keys
+	// 	   - crated via literal or make func
+	// 	   - check for presence with "value, ok"
+	// 	   - multiple assignments refer to same underlying data
+	// - Structs: - collections of disparate data types that describe as single concept
+	// 		   - keyed by neme fields
+	// 		   - normally created as types, but anonymous structs is allowed
+	// 		   - structs are value types
+	// 		   - no inheritance, but can use compostion via embedding
+	// 		   - tags can be added to struct fields to describe fields
+
 	// for loop type 1
 	var k int
 	fmt.Println("\nFor loop type 1")
@@ -385,14 +516,4 @@ func main() {
 		fmt.Println("Printing default")
 	}
 
-	//array in goland
-	var array1 [5]string
-	array1[0] = "My"
-	array1[1] = "name"
-	array1[2] = "is"
-	array1[3] = "Chairiel"
-	array1[4] = "Azizi"
-	for k = 0; k < len(array1); k++ {
-		fmt.Printf(array1[k] + " ")
-	}
 }
