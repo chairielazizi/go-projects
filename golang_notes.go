@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"reflect"
 	"strconv" // to cast number to string
 )
@@ -482,12 +483,44 @@ func main() {
 	// 		   - no inheritance, but can use compostion via embedding
 	// 		   - tags can be added to struct fields to describe fields
 
-	// for loop type 1
-	var k int
-	fmt.Println("\nFor loop type 1")
-	for k = 1; k <= 10; k += 2 {
-		fmt.Println(k)
+	// 6th chapter: If Else statement
+
+	// must always have bracket although it is only one line code
+	fmt.Println()
+	if pop, ok := statePopulations["Florida"]; ok {
+		fmt.Println(pop, ok)
 	}
+	// once it pass the first condition, it will stop and not evaluate the rest condition
+	number1 := 50
+	guess1 := 30
+	if guess1 < 1 {
+		fmt.Println("The guess must be greater than 1!")
+	} else if guess1 > 100 {
+		fmt.Println("The guess must be less than 100!")
+	} else {
+		if guess1 < number1 {
+			fmt.Println("Too low")
+		}
+		if guess1 > number1 {
+			fmt.Println("Too high")
+		}
+		if guess1 == number1 {
+			fmt.Println("You're right")
+		}
+	}
+
+	myNum1 := 0.123
+	// if myNum1 == math.Pow(math.Sqrt(myNum1), 2) {
+	if math.Abs(myNum1/math.Pow(math.Sqrt(myNum1), 2)-1) < 0.001 {
+		fmt.Println("These are the same.")
+	} else {
+		fmt.Println("They are different.")
+	}
+
+	// func returnTrue(){
+	// 	fmt.Println("returning true")
+	// 	return true
+	// }
 
 	//if else statement
 	var max int = 100
@@ -502,7 +535,7 @@ func main() {
 	//switch statement
 	a, b := 1, 2
 	switch a + b {
-	case 1:
+	case 1, 0:
 		fmt.Println("The sum is 1")
 	case 2:
 		{
@@ -516,4 +549,56 @@ func main() {
 		fmt.Println("Printing default")
 	}
 
+	// fallthrough, not really being used in golang
+	num3 := 10
+	switch {
+	case num3 <= 10:
+		fmt.Println("less than or equal to ten")
+		fallthrough // it is logicless
+	case num3 <= 20:
+		fmt.Println("less than or equal to twenty")
+	default:
+		fmt.Println("greater than twenty")
+	}
+
+	// var num4 interface{} = 1
+	var num4 interface{} = [3]int{} //array
+	switch num4.(type) {
+	case int:
+		fmt.Println("num4 is an int")
+	case float64:
+		fmt.Println("num4 is an float64")
+	case string:
+		fmt.Println("num4 is an string")
+	case [3]int:
+		fmt.Println("num4 is an [3]int")
+		// break // use to skip below code
+		fmt.Println("this will print two")
+	default:
+		fmt.Println("num4 is an another type")
+	}
+
+	// summary of if else statement
+	// - if statement: - initializer
+	// 				- comparison operators
+	// 				- logical operators
+	// 				- short circuiting // remaining are not to be executed
+	// 				- if-else statement
+	// 				- if-else if statement
+	// 				- equality and floats // when workin with floating point number
+	// - switch statement: - swtiching on a tags
+	// 					- cases with multiple tests
+	// 					- initializers
+	// 					- switches with no tags
+	// 					- fallthrough
+	// 					- inplicit break in golang
+	// 					- type switches
+	// 					- breaking out early
+
+	// for loop type 1
+	var k int
+	fmt.Println("\nFor loop type 1")
+	for k = 1; k <= 10; k += 2 {
+		fmt.Println(k)
+	}
 }
