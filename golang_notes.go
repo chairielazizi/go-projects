@@ -2,7 +2,10 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
 	"math"
+	"net/http"
 	"reflect"
 	"strconv" // to cast number to string
 )
@@ -693,4 +696,91 @@ Loop:
 	// - looping over collections:
 	// - arrays,slices,maps,strings,channels
 	// - for k,v := range collections {}
+
+	// 8th chapter: defer,panic recover
+
+	// defer the execution
+	fmt.Println("start")
+	defer fmt.Println("middle")
+	fmt.Println("end")
+	// defer works in LIFO order(last in first out)
+	// defer fmt.Println("start")
+	// defer fmt.Println("middle")
+	// defer fmt.Println("end")
+
+	res, err := http.Get("http://www.google.com/robots.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer res.Body.Close() // close after we done read them
+	robots, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("%s", robots)
+
+	defer1 := "start"
+	defer fmt.Println(defer1)
+	defer1 = "end"
+
+	// this cause panic
+	// panic1, panic2 := 1, 0
+	// ans1 := panic1 / panic2
+	// fmt.Println(ans1)
+
+	// fmt.Println("start")
+	// panic("something bas happen")
+	// fmt.Println("end")
+
+	// start GoLang web app
+	// http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request){
+	// 	w.Write([]byte("Ahoyy Go!"))
+	// })
+	// err1 := http.ListenAndServe(":8080",nil)
+	// if err1 != nil{
+	// 	panic(err.Error())
+	// }
+
+	// recover
+	fmt.Println("start")
+	// defer fmt.Println("this was deferred")
+	// recover will return nil if app is panicking
+	// defer func() {
+	// 	if err := recover(); err != nil {
+	// 		log.Println("Error:", err)
+	// 	}
+	// }()
+	// panicker()
+	panic("something bas happen")
+	fmt.Println("end")
+
+	// summary of defer,panic and recover
+	// - defer: - used to delay execution of a statement until func exits
+	// 		 - useful to group open and clise func together
+	// 		 - be careful in loops
+	// 		 - run in LIFO(last in,first out) order
+	// 		 - arguments evaluated at time defer executed,not at time of called func execution
+	// - panic: - occur when program cannot continue at all
+	// 		 - dont use when file cant be open, unless it is critical
+	// 		 - use for unrecoverable events - cannot obtain TCP port for web server
+	// 		 - func will stop executing
+	// 		 - deferred func will still fire
+	// 		 - if nothing handles panic, program will exits
+	// - recover: - used to recover from panics
+	// 		   - only useful in deferred func
+	// 		   - current func will not attemp to continue, but higher func in call stack will
+
+}
+
+//panicker function
+func panicker() {
+	fmt.Println("about to panic")
+	defer func() {
+		if err := recover(); err != nil {
+			log.Println("Error:", err)
+			// panic(err)
+		}
+	}()
+	panic("something bad happen")
+	fmt.Println("done panicking")
 }
