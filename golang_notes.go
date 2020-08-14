@@ -2,10 +2,8 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"math"
-	"net/http"
 	"reflect"
 	"strconv" // to cast number to string
 )
@@ -700,28 +698,28 @@ Loop:
 	// 8th chapter: defer,panic recover
 
 	// defer the execution
-	fmt.Println("start")
-	defer fmt.Println("middle")
-	fmt.Println("end")
+	// fmt.Println("start")
+	// defer fmt.Println("middle")
+	// fmt.Println("end")
 	// defer works in LIFO order(last in first out)
 	// defer fmt.Println("start")
 	// defer fmt.Println("middle")
 	// defer fmt.Println("end")
 
-	res, err := http.Get("http://www.google.com/robots.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer res.Body.Close() // close after we done read them
-	robots, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("%s", robots)
+	// res, err := http.Get("http://www.google.com/robots.txt")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// defer res.Body.Close() // close after we done read them
+	// robots, err := ioutil.ReadAll(res.Body)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// fmt.Printf("%s", robots)
 
-	defer1 := "start"
-	defer fmt.Println(defer1)
-	defer1 = "end"
+	// defer1 := "start"
+	// defer fmt.Println(defer1)
+	// defer1 = "end"
 
 	// this cause panic
 	// panic1, panic2 := 1, 0
@@ -742,7 +740,7 @@ Loop:
 	// }
 
 	// recover
-	fmt.Println("start")
+	// fmt.Println("start")
 	// defer fmt.Println("this was deferred")
 	// recover will return nil if app is panicking
 	// defer func() {
@@ -751,8 +749,8 @@ Loop:
 	// 	}
 	// }()
 	// panicker()
-	panic("something bas happen")
-	fmt.Println("end")
+	// panic("something bas happen")
+	// fmt.Println("end")
 
 	// summary of defer,panic and recover
 	// - defer: - used to delay execution of a statement until func exits
@@ -770,6 +768,63 @@ Loop:
 	// 		   - only useful in deferred func
 	// 		   - current func will not attemp to continue, but higher func in call stack will
 
+	// 9th chapter: Pointers
+
+	var n1 int = 42
+	var p1 *int = &n1 // holding the address og n1 in memory location
+	fmt.Println(n1, p1)
+	fmt.Println(n1, *p1) // deferencing operator
+	n1 = 27
+	fmt.Println(n1, *p1)
+	*p1 = 14
+	fmt.Println(n1, *p1)
+
+	n2 := [3]int{1, 2, 3}
+	p2 := &n2[0]
+	p3 := &n2[1]
+	fmt.Printf("%v %p %p\n", n2, p2, p3)
+
+	// pointer to struct
+	type pointerStruct struct {
+		foo int
+	}
+	var ps *pointerStruct
+	fmt.Println(ps)
+	// ps = &pointerStruct{foo: 42}
+	// fmt.Println(ps)
+	ps = new(pointerStruct)
+	ps.foo = 42
+	fmt.Println(ps.foo)
+	// (*ps).foo = 42  、、same as the above
+	// fmt.Println((*ps).foo)
+
+	// map and slices have their built in like pointer behaviour
+	// where the copy will not follow the original data
+	slice13 := []int{1, 2, 3}
+
+	// summary of Pointers
+	// - pointer types use an asterisk(*) as a prefix to type pointed to
+	// - *int - a pointer to an integer
+	// - use the address of operator(&) to get address of variable
+
+	// - deferencing pointer
+	// - deference a pointer by preceding with an asterisk
+	// - complex types(eg. structs) are automatically deferenced
+
+	// - create pointer to objects
+	// - can use  the address of operator(&) if value type already exists
+	// - *ms := myStruct{foo:42}
+	// - p := &ms
+
+	// - use address of operator(&) before initializer
+	// - &mysStruct{foo:42}
+
+	// - use the new keyword
+	// - cant initialize fields at the same time
+
+	// - types with internal pointer
+	// - all assignment operations in GO are copy operations
+	// - slices and maps contain internal pointers,so copies point to same underlying data
 }
 
 //panicker function
