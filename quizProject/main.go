@@ -26,6 +26,16 @@ func main() {
 
 	problems := parseLines(lines)
 	fmt.Println(problems)
+
+	// print to the end user
+	for i, p:=range problems{
+		fmt.Printf("Problem #%d: %s = \n",i+1,p.q)
+		var answer string
+		fmt.Scanf("%s\n",&answer) //not suitable for strings and multiple words
+		if answer == p.a{
+			fmt.Println("Correct!")
+		}
+	}
 }
 
 type problem struct {
