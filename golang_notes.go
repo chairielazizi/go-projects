@@ -800,7 +800,7 @@ Loop:
 
 	// map and slices have their built in like pointer behaviour
 	// where the copy will not follow the original data
-	slice13 := []int{1, 2, 3}
+	// slice13 := []int{1, 2, 3}
 
 	// summary of Pointers
 	// - pointer types use an asterisk(*) as a prefix to type pointed to
@@ -825,6 +825,23 @@ Loop:
 	// - types with internal pointer
 	// - all assignment operations in GO are copy operations
 	// - slices and maps contain internal pointers,so copies point to same underlying data
+
+	// 10th chapter : Functions
+
+	for i := 0; i < 5; i++ {
+		sayMessage("Ahoyy Go!", i)
+	}
+	sayGreeting("Ahoyy", "Stacey")
+
+	greeting1 := "Ahoyy"
+	name1 := "Hannah"
+	sayGreeting1(&greeting1, &name1)
+	fmt.Println(name1)
+
+	sum("The sum is", 1, 2, 3, 4, 5)
+
+	sum1 := sumPointer(1, 2, 3, 4, 5)
+	fmt.Println("The sum is", *sum1)
 }
 
 //panicker function
@@ -838,4 +855,38 @@ func panicker() {
 	}()
 	panic("something bad happen")
 	fmt.Println("done panicking")
+}
+
+// 10th chapter : Functions
+// open curly braces must be on the same line as the name of func
+
+func sayMessage(msg string, index int) {
+	fmt.Println(msg)
+	fmt.Println("The value of the index is", index)
+}
+func sayGreeting(greeting, name string) {
+	fmt.Println(greeting, name)
+	// name = "Ted"
+	// fmt.Println(name)
+}
+func sayGreeting1(greeting, name *string) {
+	fmt.Println(*greeting, *name)
+	*name = "Ted"
+	fmt.Println(*name)
+}
+func sum(msg string, values ...int) {
+	fmt.Println(values)
+	result := 0
+	for _, v := range values {
+		result += v
+	}
+	fmt.Println(msg, result)
+}
+func sumPointer(values ...int) *int {
+	fmt.Println(values)
+	result := 0
+	for _, v := range values {
+		result += v
+	}
+	return &result
 }
