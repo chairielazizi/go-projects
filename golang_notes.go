@@ -595,10 +595,102 @@ func main() {
 	// 					- type switches
 	// 					- breaking out early
 
+	// 7th chapter : Looping
+	fmt.Println()
+	for i, j := 0, 0; i < 5; i, j = i+1, j+2 {
+		fmt.Println(i, j)
+	}
+
+	for i := 0; i < 5; i++ {
+		fmt.Println(i)
+		if i%2 == 0 {
+			i /= 2
+		} else {
+			i = 2*i + 1
+		}
+	}
+
+	count1 := 0
+	for ; count1 < 5; count1++ {
+		fmt.Println(count1)
+	}
+
+	// do-while loop alike
+	for i := 0; i < 5; {
+		fmt.Println(i)
+		i++
+	}
+
+	// break statement
+	for count1 < 10 {
+		fmt.Println("count1\n", count1)
+		count1++
+		if count1 == 8 {
+			break
+		}
+	}
+
+	// continue statement
+	for i := 0; i < 5; i++ {
+		if i%2 == 0 {
+			continue
+		}
+		fmt.Println(i)
+	}
+
+	// the label loop
+Loop:
+	for i := 1; i <= 3; i++ {
+		for j := 1; j <= 3; j++ {
+			fmt.Println(i * j)
+			if i*j >= 3 {
+				break Loop
+			}
+		}
+	}
+
+	// for range loop(type 2 loop)
+	fmt.Println("\nFor range loop")
+	loop1 := []int{1, 2, 3}
+	// using key and value
+	for k, v := range loop1 {
+		fmt.Println(k, v)
+	}
+
+	loop2 := "hello Go!"
+	for k, v := range loop2 {
+		fmt.Println(k, string(v))
+		fmt.Println(k, v)
+	}
+
+	// to print out the values only from statePopulations
+	// by using _
+	for _, v := range statePopulations {
+		fmt.Println(v)
+	}
+
 	// for loop type 1
 	var k int
 	fmt.Println("\nFor loop type 1")
 	for k = 1; k <= 10; k += 2 {
 		fmt.Println(k)
 	}
+
+	// summary of Looping
+	// - for statement
+	// - no while and do-while loop
+	// - can use for loop for those
+
+	// - simple loop:
+	// - for initializer;test;incrementer {}
+	// - for test {}
+	// - for {}
+
+	// - exiting early: - break
+	// 				 - continue
+	// 				 - labels // can help to break inner and outer loop
+
+	// - looping over collections:
+	// - arrays,slices,maps,strings,channels
+	// - for k,v := range collections {}
 }
