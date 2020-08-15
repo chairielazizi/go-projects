@@ -842,6 +842,101 @@ Loop:
 
 	sum1 := sumPointer(1, 2, 3, 4, 5)
 	fmt.Println("The sum is", *sum1)
+
+	div1, err := divide(5.0, 2.0)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(div1)
+
+	// anonymous function
+	func() {
+		fmt.Println("Ahoyy Go!")
+	}() // 		() to invoke the function
+
+	for i := 0; i < 5; i++ {
+		func() {
+			fmt.Println(i)
+		}()
+	}
+
+	// assign anonymous to variable
+	var f1 func() = func() {
+		fmt.Println("Ahoyy Go!")
+	}
+	f1()
+
+	// var divide func(float64, float64) (float64, error)
+	// divide = func(a, b float64) (float64, error) {
+	// 	if b == 0.0 {
+	// 		return 0.0, fmt.Errorf("Cannot divide by zero")
+	// 	} else {
+	// 		return a / b, nil
+	// 	}
+	// }
+	// div2, err := divide(5.0, 0.0)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+	// fmt.Println(div2)
+	fmt.Println("Go")
+
+	//Method
+	g1 := greeter{
+		greeting: "Ahoyy",
+		name:     "Go!",
+	}
+	g1.greet()
+	g1.greetPointer()
+
+	// summary of Functions
+	// - function - func foo(){...}
+	// - parameter - comma delimited list of var and types
+	// 			- func foo(var string,baz int)
+
+	// 			- parameter of same type
+	// 			- func foo(bar,baz int)
+
+	// 			- when pointer are passed inm the func can change the value in the caller
+	// 			- always true for data of slices and maps
+
+	// 			- variadic parameters
+	// 			- send list of the same type
+	// 			- must be last parameter
+	// 			- received as a slice
+	// 			- func foo(bar string, baz ...int)
+
+	// - return values - single return value : func foo() int
+	// 				- multiple return value : func foo() (int,error)
+	// 				- (result type,error)
+
+	// 				- can ues named return values
+	// 				- can return addresses of local variables
+
+	// - anonymous function - func that dont have names
+	// 					 - immediately invoked
+	// 					 - func(){
+	// 						 ...
+	// 					 }()
+	// 					 - a := func(){
+	// 						 ...
+	// 					 }
+	// 					 a()
+
+	// - func as types - can assign func to variables or use as arguments and return values in funcs
+	// 				- type signature is like func signature, with no parameter names
+	// 				- var f func(string,string,int) (int,error)
+
+	// - method - func that executes in context of a type
+	// 		 - func (g greeter) greet() {
+	// 			 ...
+	// 		 }
+	// 		 - receiver can be value or pointer
+	// 		 - value receiver gets copy of type
+	// 		 - pointer receiver gets pointer to type
+
 }
 
 //panicker function
@@ -889,4 +984,34 @@ func sumPointer(values ...int) *int {
 		result += v
 	}
 	return &result
+}
+
+// not very common in go
+func sumValues(values ...int) (result int) {
+	fmt.Println(values)
+	for _, v := range values {
+		result += v
+	}
+	return
+}
+
+func divide(a, b float64) (float64, error) {
+	if b == 0.0 {
+		// panic("Cannot provide zero as second value")
+		return 0.0, fmt.Errorf("Cannot divide by zero")
+	}
+	return a / b, nil
+}
+
+// Methods
+type greeter struct {
+	greeting string
+	name     string
+}
+
+func (g greeter) greet() { // this is a method
+	fmt.Println(g.greeting, g.name)
+}
+func (g *greeter) greetPointer() { // this is a method
+	fmt.Println(g.greeting, g.name) // implicit deferencing pointer
 }
