@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"log"
 	"math"
 	"reflect"
@@ -937,6 +939,87 @@ Loop:
 	// 		 - value receiver gets copy of type
 	// 		 - pointer receiver gets pointer to type
 
+	// 11th chapter : Interfaces
+	var w1 Writer = ConsoleWriter{} // polymorhpic behaviour
+	w1.Write([]byte("Ahoyya Go!"))
+
+	myInt := IntCounter(0) // cast an integer to it
+	var inc Incrementer = &myInt
+	for i := 0; i < 10; i++ {
+		fmt.Println(inc.Increment())
+	}
+
+	var wc WriterCloser = NewBufferedWriterCloser()
+	wc.Write([]byte("Hello Peta Jensen, this is a test"))
+	wc.Close()
+
+	bwc := wc.(*BufferedWriterCloser)
+	// bwc := wc.(io.Reader)
+	fmt.Println(bwc)
+
+	r2, ok := wc.(io.Reader)
+	// r, ok := wc.(*BufferedWriterCloser)
+	// r, ok := wc.(BufferedWriterCloser) // error because of pointer
+	if ok {
+		fmt.Println(r2)
+	} else {
+		fmt.Println("Conversion failed")
+	}
+
+	// empty interface
+	var myObj1 interface{} = NewBufferedWriterCloser()
+	if wc1, ok := myObj1.(WriterCloser); ok {
+		wc1.Write([]byte("Hello Alex Blake, this is a test"))
+		wc1.Close()
+	}
+	r3, ok := myObj1.(io.Reader)
+	if ok {
+		fmt.Println(r3)
+	} else {
+		fmt.Println("Conversion failed")
+	}
+
+	var inter1 interface{} = 0
+	switch inter1.(type) {
+	case int:
+		fmt.Println("inter1 is an integer")
+	case string:
+		fmt.Println("inter1 is a string")
+	default:
+		fmt.Println("I dont know what it isS")
+	}
+
+	// summary of interface
+	// - basic:
+	// type Writer interface {
+	// 	Write([]byte) (int, error) // accept a slice bytes and return int & error
+	// }
+
+	// // implements the interface implicitly
+	// type ConsoleWriter struct{}
+
+	// func (cw ConsoleWriter) Write(data []byte) (int, error) {
+	// 	n, err := fmt.Println(string(data))
+	// 	return n, err
+	// }
+
+	// - composing interfaces
+	// - type conversion: - var wc WriterCloser = NewBufferedWriterCloser
+	// 				   - bwc := wc.(*BufferedWriterCloser)
+	// - The empty interface and type switches
+	// - implementing with values vs. pointers
+	// - method set of value is all with value receivers
+	// - method set of pointer is all methods, regardless of receiver type
+
+	// Best Practices of interfaces in Go
+	// - use many, small interfaces
+	// - single method interfaces are some of the most powerful and flexible
+	// - io.Writer, io.Reader, interface{}
+
+	// - dont export interfaces for types that will be consumed
+	// - do export interfaces for types that will be used by packages
+	// - design functions and methods to receive interfaces whenever possible
+
 }
 
 //panicker function
@@ -1014,4 +1097,82 @@ func (g greeter) greet() { // this is a method
 }
 func (g *greeter) greetPointer() { // this is a method
 	fmt.Println(g.greeting, g.name) // implicit deferencing pointer
+}
+
+// 11th chapter : Interfaces
+// interfaces just describe the data's behaviour
+// method definition
+// type Writer interface {
+// 	Write([]byte) (int, error) // accept a slice bytes and return int & error
+// }
+
+// implements the interface implicitly
+type ConsoleWriter struct{}
+
+func (cw ConsoleWriter) Write(data []byte) (int, error) {
+	n, err := fmt.Println(string(data))
+	return n, err
+}
+
+// 2nd example
+type Incrementer interface {
+	Increment() int // this is the method
+}
+type IntCounter int
+
+//implementation of Incrementer interface
+func (ic *IntCounter) Increment() int {
+	*ic++
+	return int(*ic)
+}
+
+// 3rd example
+// composing interfaces
+type Writer interface {
+	Write([]byte) (int, error)
+}
+type Closer interface {
+	Close() error
+}
+type WriterCloser interface { // like embedding in structs
+	Writer
+	Closer
+}
+type BufferedWriterCloser struct {
+	buffer *bytes.Buffer
+}
+
+func (bwc *BufferedWriterCloser) Write(data []byte) (int, error) {
+	n, err := bwc.buffer.Write(data)
+	if err != nil {
+		return 0, err
+	}
+
+	v := make([]byte, 8)
+	for bwc.buffer.Len() > 8 {
+		_, err := bwc.buffer.Read(v)
+		if err != nil {
+			return 0, err
+		}
+		_, err = fmt.Println(string(v))
+		if err != nil {
+			return 0, err
+		}
+	}
+	return n, nil
+}
+func (bwc *BufferedWriterCloser) Close() error {
+	for bwc.buffer.Len() > 8 {
+		data := bwc.buffer.Next(8)
+		_, err := fmt.Println(string(data))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+func NewBufferedWriterCloser() *BufferedWriterCloser {
+	return &BufferedWriterCloser{
+		buffer: bytes.NewBuffer([]byte{}),
+	}
 }
