@@ -10,6 +10,7 @@ import (
 	"runtime"
 	"strconv" // to cast number to string
 	"sync"
+	"time"
 )
 
 // if we declare at package level, cannot assign using :=
@@ -1105,6 +1106,129 @@ Loop:
 
 	// - check for race conditions at compile time
 	// - in console: "go run -race main.go"
+
+	// 12th chapter: Channels
+
+	// creating channel
+	ch1 := make(chan int)
+	wg.Add(2)
+	go func() { // receive data from the channel ; receiving goroutine
+		i := <-ch1
+		fmt.Println(i)
+		wg.Done()
+	}()
+	go func() { // sending goroutine
+		i := 42
+		ch1 <- i
+		i = 27 // dont care
+		wg.Done()
+	}()
+	wg.Wait()
+
+	// ch2 := make(chan int)
+	// go func() { // receive data from the channel ; receiving goroutine
+	// 	i := <-ch2
+	// 	fmt.Println(i)
+	// 	wg.Done()
+	// }()
+	// for j := 0; j < 5; j++ {
+	// 	wg.Add(2)
+
+	// 	go func() { // sending goroutine
+	// 		i := 53
+	// 		ch2 <- i // pause the execution of this gouroutine until there is space in the channel
+	// 		i = 27 // dont care
+	// 		wg.Done()
+	// 	}()
+	// }
+	// wg.Wait()
+
+	// buffered channel
+	ch3 := make(chan int, 50) // 2nd parameter is the to set the internal data in channel
+	wg.Add(2)
+	go func(ch3 <-chan int) { // receive data from the channel ; receiving goroutine
+		// i := <-ch3
+		// fmt.Println(i)
+		// i = <-ch3
+		// fmt.Println(i)
+		for i := range ch3 {
+			fmt.Println(i)
+		}
+		// ch3 <- 27
+		wg.Done()
+	}(ch3)
+	go func(ch3 chan<- int) { // sending goroutine to the channel
+		i := 78
+		ch3 <- i
+		// fmt.Println(<-ch3)
+		// i = 27 // dont care
+		ch3 <- 89
+		close(ch3) // to close the channel and send to receiver
+		wg.Done()
+	}(ch3)
+	wg.Wait()
+
+	ch4 := make(chan int, 50) // 2nd parameter is the to set the internal data in channel
+	wg.Add(2)
+	go func(ch4 <-chan int) { // receive data from the channel ; receiving goroutine
+		for {
+			if i, ok := <-ch4; ok {
+				fmt.Println(i)
+			} else {
+				break
+			}
+		}
+		// ch3 <- 27
+		wg.Done()
+	}(ch4)
+	go func(ch4 chan<- int) { // sending goroutine to the channel
+		i := 94
+		ch4 <- i
+		ch4 <- 69
+		close(ch4) // to close the channel and send to receiver
+		wg.Done()
+	}(ch4)
+	wg.Wait()
+
+	// select statement
+	go logger()
+	defer func() {
+		close(logCh)
+	}()
+	logCh <- logEntry{time.Now(), logInfo, "App is starting"}
+
+	logCh <- logEntry{time.Now(), logInfo, "App is shutting down"}
+	time.Sleep(110 * time.Millisecond)
+	// doneCh <- struct{}{}
+
+	// summary of Channels
+	// - channel basics: - create a channel with a make command
+	// 				  - make(chan int)
+
+	// 				  - send message into channel
+	// 				  - ch <- val
+
+	// 				  - receive message from channel
+	// 				  - val := <-ch
+
+	// 				  - can have mutiple senders and receivers
+
+	// - restricting data flow: - channel can ve cast into send-only or receive only versions
+	// 						 - send-only: chan <- int
+	// 						 - receive-only: <-chan int
+
+	// - buffered channels: - channels block sender side till receiver is available
+	// 					 - block reveicer side till message is available
+	// 					 - can decouple sender and receiver with buffered channels
+	// 					 - make(chan int,50)
+	// 					 - use buffered channels when send and receiver have assymmmetric loading
+
+	// - for...range loops with cahnnels: - use to monitor channel and process messages as they arrive
+	// 								   - loops exits when channel is close
+
+	// - select statements: - allows goroutine to monitor several channels at once
+	// 					 - blocks if all channels blocks
+	// 					 - if multiple channels recive value simultaneously, behaviour is undefined
 }
 
 //panicker function
@@ -1302,4 +1426,37 @@ func increment3() { // we mutate the data, so we use write Lock()
 	counter++
 	mu.Unlock()
 	wg.Done()
+}
+
+// 12th chapter: Channels
+const (
+	logInfo    = "INFO"
+	logWarning = "WARNING"
+	logError   = "ERROR"
+)
+
+type logEntry struct {
+	time     time.Time
+	severity string
+	message  string
+}
+
+var logCh = make(chan logEntry, 50)
+var doneCh = make(chan struct{})
+
+func logger() {
+	for entry := range logCh {
+		fmt.Printf("%v - [%v]%v\n", entry.time.Format("2006-01-02T15:04:05"), entry.severity, entry.message)
+	}
+}
+
+func loggerSelect() {
+	for {
+		select {
+		case entry := <-logCh:
+			fmt.Printf("%v - [%v]%v\n", entry.time.Format("2006-01-02T15:04:05"), entry.severity, entry.message)
+		case <-doneCh:
+			break
+		}
+	}
 }
