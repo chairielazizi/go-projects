@@ -7,7 +7,9 @@ import (
 	"log"
 	"math"
 	"reflect"
+	"runtime"
 	"strconv" // to cast number to string
+	"sync"
 )
 
 // if we declare at package level, cannot assign using :=
@@ -62,6 +64,11 @@ const (
 	canSeeNorthAmerica
 	canSeeSouthAmerica
 )
+
+// 12th chapter: Goroutines
+var wg = sync.WaitGroup{}
+var counter = 0
+var mu = sync.RWMutex{}
 
 func main() {
 	fmt.Println("First programe in GoLang")
@@ -1020,6 +1027,84 @@ Loop:
 	// - do export interfaces for types that will be used by packages
 	// - design functions and methods to receive interfaces whenever possible
 
+	// 12th chapter: Goroutines
+
+	// using time.Sleep
+	// go sayHello1()
+
+	// var msg1 = "Ahoy"
+	// go func(msg string) {
+	// 	fmt.Println(msg)
+	// }(msg1)
+	// // msg1 = "baibye"
+	// // time.Sleep(100*time.Millisecond)
+
+	// time.Sleep(100 * time.Millisecond) // delay the main function, without this the goroutine func will not run
+
+	// using wait group
+	var msg1 = "Ahoy"
+	wg.Add(1)
+	go func(msg string) {
+		fmt.Println(msg)
+		wg.Done()
+	}(msg1)
+	msg1 = "baibye"
+	wg.Wait()
+
+	// mutex concept
+	// runtime.GOMAXPROCS(100)
+	for i := 0; i < 10; i++ {
+		wg.Add(2) // number of goroutine to be added to wait group
+		go sayHello2()
+		go increment1()
+	}
+	wg.Wait()
+	fmt.Println()
+
+	// unfixed mutex
+	// runtime.GOMAXPROCS(100)
+	for i := 0; i < 10; i++ {
+		wg.Add(2)
+		go sayHello3()
+		go increment2()
+	}
+	wg.Wait()
+	fmt.Println()
+
+	// fixed mutex
+	// not best practices as this can be done without goroutines
+	// runtime.GOMAXPROCS(100)
+	for i := 0; i < 10; i++ {
+		wg.Add(2)
+		mu.RLock()
+		go sayHello4()
+		mu.Lock()
+		go increment3()
+	}
+	wg.Wait()
+
+	// parallelism
+	// runtime.GOMAXPROCS(100) ,generally one OS per core is minima
+	fmt.Printf("Threads: %v\n", runtime.GOMAXPROCS(-1)) // -1 will return the previous value assigned
+
+	// summary of Goroutines
+	// - creating goroutines: - use go keyword
+	// 					   - when using anonymous func, pass data as local variable
+	// - synchronization: - use sync.WaitGroup() to wait for groups of goroutines to complete
+	// 				   - use sync.Mutex() and sync.RWMutex() to protect data access
+	// - parallelism: - by default, Go will use CPU threads equal to available cores
+	// 			   - change with runtime.GOMAXPROCS
+	// 			   - more threads can increase performance, but too many can slow it down
+
+	// Best Practices
+	// - dont create goroutines in libraries
+	// - let consumer control concurrency
+
+	// - when creating a goroutine, know how it will end
+	// - avoids subtle memory leaks
+
+	// - check for race conditions at compile time
+	// - in console: "go run -race main.go"
 }
 
 //panicker function
@@ -1175,4 +1260,46 @@ func NewBufferedWriterCloser() *BufferedWriterCloser {
 	return &BufferedWriterCloser{
 		buffer: bytes.NewBuffer([]byte{}),
 	}
+}
+
+// 12th chapter: Goroutines
+func sayHello1() {
+	fmt.Println("Ahoyy")
+}
+
+func sayHello2() {
+	fmt.Printf("Ahoyy %v\n", counter)
+	wg.Done()
+}
+func increment1() {
+	counter++
+	wg.Done()
+}
+
+// using mutex (unfixed)
+func sayHello3() { // a read method
+	mu.RLock()
+	fmt.Printf("Ahoyy %v\n", counter)
+	mu.RUnlock()
+	wg.Done()
+}
+func increment2() { // we mutate the data, so we use write Lock()
+	mu.Lock()
+	counter++
+	mu.Unlock()
+	wg.Done()
+}
+
+// mutex(fixed version)
+func sayHello4() { // a read method
+	// mu.RLock() ,move to main func
+	fmt.Printf("Ahoyy %v\n", counter)
+	mu.RUnlock()
+	wg.Done()
+}
+func increment3() { // we mutate the data, so we use write Lock()
+	// mu.Lock() , move to main func
+	counter++
+	mu.Unlock()
+	wg.Done()
 }
